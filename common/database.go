@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -51,19 +51,18 @@ func Init() *gorm.DB {
 
 	// Ensure the directory exists
 	if err := ensureDir(dbPath); err != nil {
-		fmt.Println("db err: (Init - create dir) ", err)
+		log.Fatal("db err: (Init - create dir) ", err)
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
-		fmt.Println("db err: (Init) ", err)
+		log.Fatal("db err: (Init) ", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {
-		fmt.Println("db err: (Init - get sql.DB) ", err)
-	} else {
-		sqlDB.SetMaxIdleConns(10)
+		log.Fatal("db err: (Init - get sql.DB) ", err)
 	}
+	sqlDB.SetMaxIdleConns(10)
 	DB = db
 	return DB
 }
@@ -74,21 +73,20 @@ func TestDBInit() *gorm.DB {
 
 	// Ensure the directory exists
 	if err := ensureDir(testDBPath); err != nil {
-		fmt.Println("db err: (TestDBInit - create dir) ", err)
+		log.Fatal("db err: (TestDBInit - create dir) ", err)
 	}
 
 	test_db, err := gorm.Open(sqlite.Open(testDBPath), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
-		fmt.Println("db err: (TestDBInit) ", err)
+		log.Fatal("db err: (TestDBInit) ", err)
 	}
 	sqlDB, err := test_db.DB()
 	if err != nil {
-		fmt.Println("db err: (TestDBInit - get sql.DB) ", err)
-	} else {
-		sqlDB.SetMaxIdleConns(3)
+		log.Fatal("db err: (TestDBInit - get sql.DB) ", err)
 	}
+	sqlDB.SetMaxIdleConns(3)
 	DB = test_db
 	return DB
 }

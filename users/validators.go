@@ -11,11 +11,11 @@ import (
 // Then, you can just call model.save() after the data is ready in DataModel.
 type UserModelValidator struct {
 	User struct {
-		Username string `form:"username" json:"username" binding:"required,min=4,max=255"`
-		Email    string `form:"email" json:"email" binding:"required,email"`
-		Password string `form:"password" json:"password" binding:"required,min=8,max=255"`
-		Bio      string `form:"bio" json:"bio" binding:"max=1024"`
-		Image    string `form:"image" json:"image" binding:"omitempty,url"`
+		Username string  `form:"username" json:"username" binding:"required,min=4,max=255"`
+		Email    string  `form:"email" json:"email" binding:"required,email"`
+		Password *string `form:"password" json:"password" binding:"omitempty,min=8,max=255"`
+		Bio      string  `form:"bio" json:"bio" binding:"max=1024"`
+		Image    string  `form:"image" json:"image" binding:"omitempty,url"`
 	} `json:"user"`
 	userModel UserModel `json:"-"`
 }
@@ -32,8 +32,8 @@ func (self *UserModelValidator) Bind(c *gin.Context) error {
 	self.userModel.Email = self.User.Email
 	self.userModel.Bio = self.User.Bio
 
-	if self.User.Password != common.RandomPassword {
-		if err := self.userModel.setPassword(self.User.Password); err != nil {
+	if self.User.Password != nil && *self.User.Password != "" {
+		if err := self.userModel.setPassword(*self.User.Password); err != nil {
 			return err
 		}
 	}
@@ -54,7 +54,7 @@ func NewUserModelValidatorFillWith(userModel UserModel) UserModelValidator {
 	userModelValidator.User.Username = userModel.Username
 	userModelValidator.User.Email = userModel.Email
 	userModelValidator.User.Bio = userModel.Bio
-	userModelValidator.User.Password = common.RandomPassword
+	userModelValidator.User.Password = nil
 
 	if userModel.Image != nil {
 		userModelValidator.User.Image = *userModel.Image

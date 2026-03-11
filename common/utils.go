@@ -3,8 +3,11 @@ package common
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
+	"log"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +15,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+// TokenClaims is the typed JWT claims struct used for token generation and parsing.
+type TokenClaims struct {
+	ID uint `json:"id"`
+	jwt.RegisteredClaims
+}
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -37,16 +46,26 @@ func RandInt() int {
 	return int(randNum.Int64())
 }
 
-// Keep this two config private, it should not expose to open source
-const JWTSecret = "A String Very Very Very Strong!!@##$!@#$"      // #nosec G101
-const RandomPassword = "A String Very Very Very Random!!@##$!@#4" // #nosec G101
+// JWTSecret is loaded from JWT_SECRET env var; falls back to dev default if unset.
+var JWTSecret string // #nosec G101
+
+func init() {
+	JWTSecret = os.Getenv("JWT_SECRET")
+	if JWTSecret == "" {
+		JWTSecret = "A String Very Very Very Strong!!@##$!@#$" // #nosec G101
+		log.Println("[WARNING] JWT_SECRET env var not set; using insecure dev default. Do NOT use in production.")
+	}
+}
 
 // A Util function to generate jwt_token which can be used in the request header
 func GenToken(id uint) string {
-	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	})
+	claims := TokenClaims{
+		ID: id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+		},
+	}
+	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Sign and get the complete encoded token as a string
 	token, err := jwt_token.SignedString([]byte(JWTSecret))
 	if err != nil {
@@ -68,16 +87,17 @@ type CommonError struct {
 func NewValidatorError(err error) CommonError {
 	res := CommonError{}
 	res.Errors = make(map[string]interface{})
-	errs := err.(validator.ValidationErrors)
-	for _, v := range errs {
-		// can translate each error one at a time.
-		//fmt.Println("gg",v.NameNamespace)
-		if v.Param() != "" {
-			res.Errors[v.Field()] = fmt.Sprintf("{%v: %v}", v.Tag(), v.Param())
-		} else {
-			res.Errors[v.Field()] = fmt.Sprintf("{key: %v}", v.Tag())
+	var errs validator.ValidationErrors
+	if errors.As(err, &errs) {
+		for _, v := range errs {
+			if v.Param() != "" {
+				res.Errors[v.Field()] = fmt.Sprintf("{%v: %v}", v.Tag(), v.Param())
+			} else {
+				res.Errors[v.Field()] = fmt.Sprintf("{key: %v}", v.Tag())
+			}
 		}
-
+	} else {
+		res.Errors["error"] = err.Error()
 	}
 	return res
 }

@@ -52,7 +52,7 @@ func AuthMiddleware(auto401 bool) gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, &common.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 			// Validate the signing method
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
@@ -67,9 +67,8 @@ func AuthMiddleware(auto401 bool) gin.HandlerFunc {
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			my_user_id := uint(claims["id"].(float64))
-			UpdateContextUserModel(c, my_user_id)
+		if claims, ok := token.Claims.(*common.TokenClaims); ok && token.Valid {
+			UpdateContextUserModel(c, claims.ID)
 		}
 	}
 }
