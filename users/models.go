@@ -45,8 +45,8 @@ type FollowModel struct {
 func AutoMigrate() {
 	db := common.GetDB()
 
-	db.AutoMigrate(&UserModel{})
-	db.AutoMigrate(&FollowModel{})
+	_ = db.AutoMigrate(&UserModel{})   // #nosec G104
+	_ = db.AutoMigrate(&FollowModel{}) // #nosec G104
 }
 
 // What's bcrypt? https://en.wikipedia.org/wiki/Bcrypt

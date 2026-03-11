@@ -44,7 +44,9 @@ func (s *ArticleModelValidator) Bind(c *gin.Context) error {
 	s.articleModel.Description = s.Article.Description
 	s.articleModel.Body = s.Article.Body
 	s.articleModel.Author = GetArticleUserModel(myUserModel)
-	s.articleModel.setTags(s.Article.Tags)
+	if err := s.articleModel.setTags(s.Article.Tags); err != nil {
+		return err
+	}
 	return nil
 }
 

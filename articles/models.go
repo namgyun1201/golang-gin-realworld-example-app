@@ -70,7 +70,10 @@ func (article ArticleModel) favoritesCount() uint {
 	db.Model(&FavoriteModel{}).Where(FavoriteModel{
 		FavoriteID: article.ID,
 	}).Count(&count)
-	return uint(count)
+	if count < 0 {
+		count = 0
+	}
+	return uint(count) // #nosec G115
 }
 
 func (article ArticleModel) isFavoriteBy(user ArticleUserModel) bool {

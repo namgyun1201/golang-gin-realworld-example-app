@@ -2,12 +2,13 @@ package articles
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gothinkster/golang-gin-realworld-example-app/common"
 	"github.com/gothinkster/golang-gin-realworld-example-app/users"
 	"gorm.io/gorm"
-	"net/http"
-	"strconv"
 )
 
 func ArticlesRegister(router *gin.RouterGroup) {
@@ -72,7 +73,7 @@ func ArticleFeed(c *gin.Context) {
 	offset := c.Query("offset")
 	myUserModel := c.MustGet("my_user_model").(users.UserModel)
 	if myUserModel.ID == 0 {
-		c.AbortWithError(http.StatusUnauthorized, errors.New("{error : \"Require auth!\"}"))
+		_ = c.AbortWithError(http.StatusUnauthorized, errors.New("{error : \"Require auth!\"}"))
 		return
 	}
 	articleUserModel := GetArticleUserModel(myUserModel)

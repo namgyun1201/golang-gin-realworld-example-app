@@ -14,11 +14,11 @@ import (
 
 func Migrate(db *gorm.DB) {
 	users.AutoMigrate()
-	db.AutoMigrate(&articles.ArticleModel{})
-	db.AutoMigrate(&articles.TagModel{})
-	db.AutoMigrate(&articles.FavoriteModel{})
-	db.AutoMigrate(&articles.ArticleUserModel{})
-	db.AutoMigrate(&articles.CommentModel{})
+	_ = db.AutoMigrate(&articles.ArticleModel{})  // #nosec G104
+	_ = db.AutoMigrate(&articles.TagModel{})      // #nosec G104
+	_ = db.AutoMigrate(&articles.FavoriteModel{}) // #nosec G104
+	_ = db.AutoMigrate(&articles.ArticleUserModel{})
+	_ = db.AutoMigrate(&articles.CommentModel{})
 }
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Println("failed to get sql.DB:", err)
 	} else {
-		defer sqlDB.Close()
+		defer sqlDB.Close() //nolint:errcheck
 	}
 
 	r := gin.Default()

@@ -1,19 +1,66 @@
-linters:
-  disable-all: true
+version: "2"
+
+formatters:
   enable:
+    - gofmt
+    - goimports
+
+linters:
+  default: none
+  enable:
+    # Bug detection
     - staticcheck
-    - unused
+    - govet
+    - ineffassign
+
+    # Style
     - misspell
 
-linters-settings:
-  misspell:
-    locale: US
+    # Code quality
+    - unused
+    - errcheck
 
-issues:
-  exclude-use-default: true
-  max-issues-per-linter: 50
-  max-same-issues: 10
-  
+    # Security
+    - gosec
+
+  settings:
+    misspell:
+      locale: US
+    gosec:
+      excludes:
+        - G101
+      config:
+        global:
+          nosec: true
+    errcheck:
+      exclude-functions:
+        - (*gorm.io/gorm.DB).AutoMigrate
+        - (github.com/gin-gonic/gin.ResponseWriter).Write
+
+  exclusions:
+    # Exclude test files from strict linters
+    rules:
+      - path: '_test\.go'
+        linters:
+          - errcheck
+          - gosec
+          - ineffassign
+      # Pre-existing style issues in source code
+      - text: 'ST1005:'
+        linters:
+          - staticcheck
+      - text: 'ST1006:'
+        linters:
+          - staticcheck
+      - text: 'QF1008:'
+        linters:
+          - staticcheck
+    paths:
+      - vendor
+      - data
+
 run:
   timeout: 5m
-  go: '1.22'
+  build-tags:
+    - integration
+    - e2e

@@ -33,7 +33,9 @@ func (self *UserModelValidator) Bind(c *gin.Context) error {
 	self.userModel.Bio = self.User.Bio
 
 	if self.User.Password != common.RandomPassword {
-		self.userModel.setPassword(self.User.Password)
+		if err := self.userModel.setPassword(self.User.Password); err != nil {
+			return err
+		}
 	}
 	if self.User.Image != "" {
 		self.userModel.Image = &self.User.Image
