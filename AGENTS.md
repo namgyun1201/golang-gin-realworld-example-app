@@ -6,6 +6,21 @@ This document provides instructions for AI coding agents working on this reposit
 
 This is a **Golang/Gin** implementation of the [RealWorld](https://github.com/gothinkster/realworld) example application. It demonstrates a fully fledged fullstack application including CRUD operations, authentication, routing, pagination, and more.
 
+## Development Workflow
+
+This project uses **openspec** for plan-centered vibe coding. All feature work must follow this cycle:
+
+1. **Explore** → `/opsx:explore` — Investigate and understand the problem
+2. **Propose** → `/opsx:propose <name>` — Generate proposal.md, design.md, tasks.md
+3. **Review** → Human reviews artifacts in `openspec/changes/<name>/`
+4. **Implement** → `/opsx:apply <name>` — Execute approved tasks
+5. **Archive** → `/opsx:archive <name>` — Archive completed work
+
+- Active changes live in `openspec/changes/`
+- Archived changes live in `openspec/changes/archive/`
+- Project context and rules are defined in `openspec/config.yaml`
+- See `CLAUDE.md` for the full vibe coding workflow instructions
+
 ## Technology Stack
 
 - **Go**: 1.21+ required

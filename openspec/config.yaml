@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Go 1.21+, Gin v1.10, GORM v2 (gorm.io/gorm), SQLite, JWT (golang-jwt/jwt/v5), go-playground/validator/v10
+  Architecture: Modular package structure - users/, articles/, common/ with entry point hello.go
+  Domain: RealWorld "Conduit" clone - CRUD articles, comments, tags, user profiles, follow/favorite, JWT authentication
+  API: RESTful JSON API under /api prefix, follows the RealWorld API spec (https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints)
+  Testing: go test ./... with testify assertions, TestDBInit/TestDBFree for DB lifecycle, Newman for API integration tests
+  Conventions:
+    - GORM v2 patterns: Preload() not Related(), Association().Find() for M2M, Updates() not Update(), pointer Delete(), int64 Count
+    - Explicit error handling (never ignore errors with _)
+    - Use "required" validator tag (not deprecated "exists")
+    - JWT via jwt.NewWithClaims()
+    - Conventional commits for git messages
+
+rules:
+  proposal:
+    - Keep proposals focused on a single concern
+    - Reference existing module boundaries (users/, articles/, common/)
+    - Include impact analysis on existing API endpoints
+    - Note if new database migrations or schema changes are needed
+    - Always include a "Non-goals" section
+  design:
+    - Reference GORM v2 patterns from AGENTS.md
+    - Identify which package(s) are affected and why
+    - Include middleware and routing implications
+    - Note security considerations (JWT auth, input validation, SQL injection prevention)
+    - Specify error response format consistent with RealWorld spec
+  tasks:
+    - Each task should be independently completable and testable
+    - Include the specific file(s) to create or modify
+    - Include a verification step (test command or manual check)
+    - Group tasks by package when touching multiple modules
+    - Keep each task under 2 hours of work
