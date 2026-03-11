@@ -140,6 +140,32 @@ go test -v ./... -cover
 ```
 depending on whether you want to see test coverage and how verbose the output you want.
 
+## Vibe Coding Workflow
+
+This project uses [openspec](https://github.com/openspec-dev/openspec) for plan-centered development. All feature work follows the **explore → propose → review → implement → archive** cycle.
+
+```bash
+# Explore: investigate the codebase, think through ideas
+/opsx:explore
+
+# Propose: generate a change with proposal, design, specs, and tasks
+/opsx:propose <change-name>
+
+# Implement: execute tasks from the approved change
+/opsx:apply <change-name>
+
+# Archive: archive completed changes and update specs
+/opsx:archive <change-name>
+```
+
+Domain specs are maintained in `openspec/specs/`:
+- `user-auth` — 사용자 등록, 로그인, JWT 인증
+- `user-profiles` — 프로필 조회, 팔로우/언팔로우
+- `articles-crud` — 아티클 CRUD, 피드, 목록 필터링
+- `comments` — 아티클 댓글 관리
+- `favorites-and-tags` — 즐겨찾기, 태그 목록
+- `common-infra` — DB, JWT, 유효성 검증, 에러 처리
+
 ## Todo
 - More elegance config
 - ProtoBuf support
